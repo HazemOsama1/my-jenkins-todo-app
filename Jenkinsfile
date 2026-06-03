@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Setup System Dependencies') {
             steps {
+                sh 'git config --global --add safe.directory "*"'
                 echo 'Installing Python, Tkinter, Xvfb and dependencies...'
                 sh '''
                     apt-get update -qq
