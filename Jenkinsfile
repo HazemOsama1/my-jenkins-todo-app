@@ -6,11 +6,16 @@ pipeline {
         }
     }
 
-    stages {
+    options {
+        // This stops Jenkins from doing the broken automatic checkout before the container is ready
+        skipDefaultCheckout() 
+    }
 
+    stages {
         stage('Checkout') {
             steps {
                 echo 'Cloning the repository...'
+                // Manually run checkout here cleanly
                 checkout scm
             }
         }
@@ -20,7 +25,7 @@ pipeline {
                 echo 'Installing Tkinter, Xvfb and fonts...'
                 sh '''
                     apt-get update -qq
-                    apt-get install -y python3-tk xvfb libtk8.6
+                    apt-get install -y python3-tk xvfb libtk8.6 git
                 '''
             }
         }
@@ -51,7 +56,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
