@@ -5,5 +5,5 @@ ttkthemes==3.2.2
 reportlab==4.0.8
 plyer==2.1.0
 schedule==1.2.0
-pillow==10.2.0
+pillow
 python-dateutil==2.8.2
