@@ -1,7 +1,14 @@
 pipeline {
     agent any // Runs directly inside your running Jenkins container context
-
+    options {
+        skipDefaultCheckout(true)
+    }
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Setup System Dependencies') {
             steps {
                 sh 'git config --global --add safe.directory "*"'
