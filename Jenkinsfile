@@ -1,31 +1,13 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11'
-            args '--user root'
-        }
-    }
-
-    options {
-        // This stops Jenkins from doing the broken automatic checkout before the container is ready
-        skipDefaultCheckout() 
-    }
+    agent any // Runs directly inside your running Jenkins container context
 
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Cloning the repository...'
-                // Manually run checkout here cleanly
-                checkout scm
-            }
-        }
-
         stage('Setup System Dependencies') {
             steps {
-                echo 'Installing Tkinter, Xvfb and fonts...'
+                echo 'Installing Python, Tkinter, Xvfb and dependencies...'
                 sh '''
                     apt-get update -qq
-                    apt-get install -y python3-tk xvfb libtk8.6 git
+                    apt-get install -y python3 python3-pip python3-tk xvfb libtk8.6
                 '''
             }
         }
@@ -33,14 +15,15 @@ pipeline {
         stage('Install Python Dependencies') {
             steps {
                 echo 'Installing Python packages...'
-                sh 'pip install -r requirements.txt'
+                // Using --break-system-packages allows pip to install globally inside the lab container safely
+                sh 'pip3 install --break-system-packages -r requirements.txt'
             }
         }
 
         stage('Syntax Check') {
             steps {
                 echo 'Checking Python syntax...'
-                sh 'python -m py_compile app/main.py && echo "Syntax OK"'
+                sh 'python3 -m py_compile app/main.py && echo "Syntax OK"'
             }
         }
 
@@ -51,7 +34,7 @@ pipeline {
                     Xvfb :99 -screen 0 1024x768x24 &
                     sleep 2
                     export DISPLAY=:99
-                    timeout 5 python app/main.py || true
+                    timeout 5 python3 app/main.py || true
                     echo "App ran successfully."
                 '''
             }
